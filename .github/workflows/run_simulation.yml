@@ -23,7 +23,7 @@ jobs:
         run: pip install numpy matplotlib reportlab
 
       - name: Run simulation
-        run: python housing_sim_actions.py
+        run: python housing_sim_v3.py
 
       - name: Save results to repo
         run: |
