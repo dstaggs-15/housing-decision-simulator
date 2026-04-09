@@ -1,0 +1,37 @@
+name: Run Housing Simulation
+
+on:
+  workflow_dispatch:   # Run manually from GitHub UI with a button click
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install numpy matplotlib reportlab
+
+      - name: Run simulation
+        run: python housing_sim_actions.py
+
+      - name: Upload PDF report
+        uses: actions/upload-artifact@v4
+        with:
+          name: housing-report-${{ github.run_number }}
+          path: outputs/housing_analysis_report.pdf
+          retention-days: 30
+
+      - name: Upload charts
+        uses: actions/upload-artifact@v4
+        with:
+          name: housing-charts-${{ github.run_number }}
+          path: outputs/charts/
+          retention-days: 30

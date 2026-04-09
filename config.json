@@ -1,0 +1,56 @@
+{
+  "_comment": "Edit these values in GitHub, then trigger the workflow to get new results.",
+
+  "simulation": {
+    "months": 60,
+    "mc_runs": 1000
+  },
+
+  "income_and_savings": {
+    "monthly_income": 5100,
+    "starting_cash": 22000
+  },
+
+  "option_b_house": {
+    "home_price": 98500,
+    "down_pct": 3.5,
+    "closing_pct": 5.0,
+    "mortgage_apr": 7.0,
+    "mortgage_term_months": 360
+  },
+
+  "monthly_expenses": {
+    "option_a": {
+      "fixed_base": 1700,
+      "gas": 600,
+      "repair_mean": 50,
+      "repair_std": 40
+    },
+    "option_b": {
+      "fixed_base": 1800,
+      "gas": 300,
+      "repair_mean": 200,
+      "repair_std": 150,
+      "repair_cap": 1200
+    }
+  },
+
+  "rental_income": {
+    "rental_start_month": 38,
+    "rent_min": 800,
+    "rent_max": 1000,
+    "vacancy_rate_pct": 10
+  },
+
+  "rates_and_growth": {
+    "gas_volatility_pct": 15,
+    "annual_appreciation_pct": 3.0,
+    "annual_inflation_pct": 3.0,
+    "annual_invest_return_pct": 4.5
+  },
+
+  "commute": {
+    "hourly_time_value": 16,
+    "extra_commute_hrs_per_month": 35
+  }
+}
