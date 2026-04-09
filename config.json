@@ -1,5 +1,5 @@
 {
-  "_comment": "Edit these values in GitHub, then trigger the workflow to get new results.",
+  "_comment": "Edit these values, then trigger the workflow to get new results.",
 
   "simulation": {
     "months": 60,
