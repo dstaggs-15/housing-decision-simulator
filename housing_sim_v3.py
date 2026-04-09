@@ -140,6 +140,146 @@ print(f"    Rent range:      ${RENT_MIN:.0f}–${RENT_MAX:.0f}/mo  |  Vacancy: {
 print(f"    Passive income goal: ${PASSIVE_GOAL:.0f}/mo")
 
 # =============================================================================
+# AFFORDABILITY CHECK (deterministic — no randomness, straight-line projection)
+# =============================================================================
+
+def affordability_check():
+    """
+    Projects cash forward using average expenses (no random events).
+    Checks if each purchase is affordable at the scheduled month.
+    If not, finds the earliest month it becomes affordable.
+    Returns a dict of results for printing and PDF inclusion.
+    """
+    results = {}
+
+    # ---- Option B: House 1 at Month 1 ----
+    cash_b1 = STARTING_CASH - B1_UPFRONT
+    results['b1_starting_cash']   = STARTING_CASH
+    results['b1_upfront']         = B1_UPFRONT
+    results['b1_cash_after']      = cash_b1
+    results['b1_affordable']      = cash_b1 >= 0
+    results['b1_cushion']         = cash_b1  # how much left over
+
+    # ---- Option B: Project cash to B_MOVEOUT, check House 2 ----
+    cash = cash_b1
+    for m in range(1, B_MOVEOUT + 1):
+        inf  = (1 + MONTHLY_INF) ** (m - 1)
+        exp  = B1_MPAYMENT + B1_FIXED * inf + B1_GAS * inf + B1_REP_MEAN * inf
+        cash += MONTHLY_INCOME - exp
+        cash *= (1 + MONTHLY_INVEST)
+
+    results['b2_cash_at_moveout']  = cash
+    results['b2_upfront']          = B2_UPFRONT
+    results['b2_cash_after']       = cash - B2_UPFRONT
+    results['b2_affordable']       = cash >= B2_UPFRONT
+    results['b2_scheduled_month']  = B_MOVEOUT
+
+    # If not affordable at scheduled month, find earliest month
+    if not results['b2_affordable']:
+        cash2 = cash_b1
+        earliest = None
+        for m in range(1, MONTHS + 1):
+            inf = (1 + MONTHLY_INF) ** (m - 1)
+            if m <= B_MOVEOUT:
+                exp = B1_MPAYMENT + B1_FIXED * inf + B1_GAS * inf + B1_REP_MEAN * inf
+                flow = MONTHLY_INCOME - exp
+            else:
+                rent = (RENT_MIN + RENT_MAX) / 2 * (1 + MONTHLY_INF) ** (m - B_MOVEOUT)
+                exp  = B1_MPAYMENT + B2_FIXED * inf + B2_GAS * inf + B2_REP_MEAN * inf
+                flow = MONTHLY_INCOME - exp + rent
+            cash2 += flow
+            cash2 *= (1 + MONTHLY_INVEST)
+            if cash2 >= B2_UPFRONT and earliest is None:
+                earliest = m
+        results['b2_earliest_month'] = earliest
+    else:
+        results['b2_earliest_month'] = B_MOVEOUT
+
+    # ---- Option A: Trailer fixup at Month 1 ----
+    results['a_trailer_starting_cash'] = STARTING_CASH
+    results['a_trailer_fixup']         = TRAILER_FIXUP
+    results['a_cash_after_fixup']      = STARTING_CASH - TRAILER_FIXUP
+    results['a_trailer_affordable']    = STARTING_CASH >= TRAILER_FIXUP
+
+    # ---- Option A: Project cash to A_MOVEOUT, check permanent home ----
+    cash_a = STARTING_CASH - TRAILER_FIXUP
+    for m in range(1, A_MOVEOUT + 1):
+        inf   = (1 + MONTHLY_INF) ** (m - 1)
+        exp   = TRAILER_FIXED * inf + TRAILER_GAS * inf + TRAILER_REP_MEAN * inf
+        cash_a += MONTHLY_INCOME - exp
+        cash_a *= (1 + MONTHLY_INVEST)
+
+    results['a_cash_at_moveout']   = cash_a
+    results['a_upfront']           = A_UPFRONT
+    results['a_cash_after_home']   = cash_a - A_UPFRONT
+    results['a_affordable']        = cash_a >= A_UPFRONT
+    results['a_scheduled_month']   = A_MOVEOUT
+
+    if not results['a_affordable']:
+        cash3 = STARTING_CASH - TRAILER_FIXUP
+        earliest_a = None
+        for m in range(1, MONTHS + 1):
+            inf   = (1 + MONTHLY_INF) ** (m - 1)
+            exp   = TRAILER_FIXED * inf + TRAILER_GAS * inf + TRAILER_REP_MEAN * inf
+            cash3 += MONTHLY_INCOME - exp
+            cash3 *= (1 + MONTHLY_INVEST)
+            if cash3 >= A_UPFRONT and earliest_a is None:
+                earliest_a = m
+        results['a_earliest_month'] = earliest_a
+    else:
+        results['a_earliest_month'] = A_MOVEOUT
+
+    # ---- Monthly cashflow sanity ----
+    results['a_trailer_monthly_exp']     = TRAILER_FIXED + TRAILER_GAS + TRAILER_REP_MEAN
+    results['a_trailer_monthly_savings'] = MONTHLY_INCOME - results['a_trailer_monthly_exp']
+    results['b1_monthly_exp']            = B1_MPAYMENT + B1_FIXED + B1_GAS + B1_REP_MEAN
+    results['b1_monthly_savings']        = MONTHLY_INCOME - results['b1_monthly_exp']
+
+    # ---- Print summary ----
+    ok = lambda x: '✓ AFFORDABLE' if x else '✗ NOT AFFORDABLE'
+    print('\n' + '=' * 65)
+    print('  AFFORDABILITY CHECK')
+    print('=' * 65)
+
+    print(f'\n  OPTION A — Trailer fixup (Month 1):')
+    print(f'    Starting cash:            ${STARTING_CASH:>10,.0f}')
+    print(f'    Trailer fixup cost:      -${TRAILER_FIXUP:>10,.0f}')
+    print(f'    Cash remaining:           ${results["a_cash_after_fixup"]:>10,.0f}  {ok(results["a_trailer_affordable"])}')
+    print(f'    Monthly savings (trailer): ${results["a_trailer_monthly_savings"]:>9,.0f}/mo')
+
+    print(f'\n  OPTION A — Buy permanent home (scheduled Month {A_MOVEOUT}):')
+    print(f'    Projected cash at Mo {A_MOVEOUT}:  ${results["a_cash_at_moveout"]:>10,.0f}')
+    print(f'    Down + closing needed:   -${results["a_upfront"]:>10,.0f}')
+    print(f'    Cash remaining after:     ${results["a_cash_after_home"]:>10,.0f}  {ok(results["a_affordable"])}')
+    if not results['a_affordable']:
+        print(f'    Earliest affordable month: Month {results["a_earliest_month"]}')
+    else:
+        delay = results['a_earliest_month'] - A_MOVEOUT
+        print(f'    Could buy {abs(delay)} months earlier if needed')
+
+    print(f'\n  OPTION B — Buy House 1 (Month 1):')
+    print(f'    Starting cash:            ${STARTING_CASH:>10,.0f}')
+    print(f'    Down + closing needed:   -${B1_UPFRONT:>10,.0f}')
+    print(f'    Cash remaining:           ${results["b1_cash_after"]:>10,.0f}  {ok(results["b1_affordable"])}')
+    print(f'    Monthly savings (house1):  ${results["b1_monthly_savings"]:>9,.0f}/mo')
+
+    print(f'\n  OPTION B — Buy House 2 (scheduled Month {B_MOVEOUT}):')
+    print(f'    Projected cash at Mo {B_MOVEOUT}:  ${results["b2_cash_at_moveout"]:>10,.0f}')
+    print(f'    Down + closing needed:   -${B2_UPFRONT:>10,.0f}')
+    print(f'    Cash remaining after:     ${results["b2_cash_after"]:>10,.0f}  {ok(results["b2_affordable"])}')
+    if not results['b2_affordable']:
+        print(f'    Earliest affordable month: Month {results["b2_earliest_month"]}')
+        print(f'    *** WARNING: Simulation will delay House 2 purchase until affordable ***')
+    else:
+        months_early = B_MOVEOUT - results['b2_earliest_month'] if results['b2_earliest_month'] < B_MOVEOUT else 0
+        if months_early > 0:
+            print(f'    Could afford House 2 {months_early} months earlier than scheduled')
+
+    print('=' * 65)
+    return results
+
+
+# =============================================================================
 # OUTPUT DIRS
 # =============================================================================
 OUTPUT_DIR = "./outputs"
@@ -218,6 +358,8 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
         'passive_income', 'rental_gross',
         'a_expenses', 'b_expenses',
     ]}
+    a_actual_purchase_month  = None
+    b2_actual_purchase_month = None
 
     for month in range(1, MONTHS + 1):
         if month > 1:
@@ -231,11 +373,13 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
         # ============================================================
 
         # Phase transition: move out of trailer, buy permanent home
-        if a_in_trailer and month > A_MOVEOUT:
+        # Only buy when scheduled AND cash is actually sufficient
+        if a_in_trailer and month > A_MOVEOUT and a_cash >= A_UPFRONT:
             a_in_trailer = False
             a_cash      -= A_UPFRONT
             a_loan_bal   = A_LOAN
             a_home_val   = A_PRICE
+            a_actual_purchase_month = month
 
         if a_in_trailer:
             # Trailer expenses
@@ -266,12 +410,14 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
         # ============================================================
 
         # Phase transition: move out of House 1, buy House 2
-        if b_in_house1 and month > B_MOVEOUT:
+        # Only buy when scheduled AND cash is actually sufficient
+        if b_in_house1 and month > B_MOVEOUT and b_cash >= B2_UPFRONT:
             b_in_house1  = False
             b_has_house2 = True
             b_cash      -= B2_UPFRONT
             b2_loan_bal  = B2_LOAN
             b2_home_val  = B2_PRICE
+            b2_actual_purchase_month = month
 
         # House 1 always appreciates and amortizes (it's always owned)
         _, _, b1_loan_bal = amortize(b1_loan_bal, B1_MRATE, B1_MPAYMENT)
@@ -324,6 +470,8 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
         out['a_expenses'].append(a_exp)
         out['b_expenses'].append(b_exp)
 
+    out['a_actual_purchase_month']  = a_actual_purchase_month
+    out['b2_actual_purchase_month'] = b2_actual_purchase_month
     return out
 
 
@@ -341,8 +489,10 @@ def monte_carlo(use_time_value=False, income_growth_annual=0.0, label=""):
     all_b_cash    = np.zeros((MC_RUNS, MONTHS))
     all_passive   = np.zeros((MC_RUNS, MONTHS))
     all_rental    = np.zeros((MC_RUNS, MONTHS))
-    be_months     = []
-    goal_months   = []
+    be_months              = []
+    goal_months            = []
+    a_purchase_months      = []
+    b2_purchase_months     = []
 
     for i in range(MC_RUNS):
         p = run_one_path(use_time_value, income_growth_annual)
@@ -355,6 +505,9 @@ def monte_carlo(use_time_value=False, income_growth_annual=0.0, label=""):
         all_b_cash[i]  = p['b_cash']
         all_passive[i] = p['passive_income']
         all_rental[i]  = p['rental_gross']
+
+        a_purchase_months.append(p['a_actual_purchase_month']  if p['a_actual_purchase_month']  else MONTHS + 1)
+        b2_purchase_months.append(p['b2_actual_purchase_month'] if p['b2_actual_purchase_month'] else MONTHS + 1)
 
         # Break-even: 3 consecutive months B > A
         diff = np.array(p['b_nw']) - np.array(p['a_nw'])
@@ -403,7 +556,13 @@ def monte_carlo(use_time_value=False, income_growth_annual=0.0, label=""):
         'be_pct':         be_pct,
         'goal_months':    goal_months,
         'goal_median':    goal_med,
-        'goal_pct':       goal_pct,
+        'goal_pct':          goal_pct,
+        'a_purchase_months':  a_purchase_months,
+        'b2_purchase_months': b2_purchase_months,
+        'a_purchase_delayed_pct':  sum(m > A_MOVEOUT + 1 for m in a_purchase_months)  / MC_RUNS * 100,
+        'b2_purchase_delayed_pct': sum(m > B_MOVEOUT + 1 for m in b2_purchase_months) / MC_RUNS * 100,
+        'a_purchase_med':   float(np.median([m for m in a_purchase_months  if m <= MONTHS])) if any(m <= MONTHS for m in a_purchase_months)  else float('nan'),
+        'b2_purchase_med':  float(np.median([m for m in b2_purchase_months if m <= MONTHS])) if any(m <= MONTHS for m in b2_purchase_months) else float('nan'),
         'final_a_nw':     float(np.mean(all_a_nw[:, -1])),
         'final_b_nw':     float(np.mean(all_b_nw[:, -1])),
         'final_a_p10':    float(np.percentile(all_a_nw[:, -1], 10)),
@@ -871,7 +1030,7 @@ def chart_upfront():
 # PDF REPORT
 # =============================================================================
 
-def build_pdf(base, tv, scenarios, charts):
+def build_pdf(base, tv, scenarios, charts, afford):
     path = os.path.join(OUTPUT_DIR, 'housing_analysis_report.pdf')
     doc  = SimpleDocTemplate(path, pagesize=letter,
                              leftMargin=0.75*inch, rightMargin=0.75*inch,
@@ -961,6 +1120,72 @@ def build_pdf(base, tv, scenarios, charts):
     ]
     story.append(table(param_data, [2.5*inch, 2.0*inch, 2.5*inch]))
     story.append(Spacer(1, 8))
+
+    # Affordability section
+    story.append(Paragraph('Affordability Check', S['h1']))
+    story.append(Paragraph(
+        'The following table shows whether each scheduled purchase is actually affordable '
+        'based on projected cash at the time of purchase. If a purchase is not affordable '
+        'at the scheduled month, the simulation automatically delays it until cash is sufficient.',
+        S['body']))
+
+    ok = lambda x: '✓ Affordable' if x else '✗ Not affordable at scheduled month'
+    afford_data = [
+        ['Purchase', 'Scheduled Month', 'Cash Available', 'Cost Required', 'Left Over', 'Status'],
+        ['Option A — Trailer fixup', 'Month 1',
+         f'${afford["a_trailer_starting_cash"]:,.0f}',
+         f'${afford["a_trailer_fixup"]:,.0f}',
+         f'${afford["a_cash_after_fixup"]:,.0f}',
+         ok(afford['a_trailer_affordable'])],
+        ['Option A — Permanent home', f'Month {A_MOVEOUT}',
+         f'${afford["a_cash_at_moveout"]:,.0f}',
+         f'${afford["a_upfront"]:,.0f}',
+         f'${afford["a_cash_after_home"]:,.0f}',
+         ok(afford['a_affordable'])],
+        ['Option B — Buy House 1', 'Month 1',
+         f'${afford["b1_starting_cash"]:,.0f}',
+         f'${afford["b1_upfront"]:,.0f}',
+         f'${afford["b1_cash_after"]:,.0f}',
+         ok(afford['b1_affordable'])],
+        ['Option B — Buy House 2', f'Month {B_MOVEOUT}',
+         f'${afford["b2_cash_at_moveout"]:,.0f}',
+         f'${afford["b2_upfront"]:,.0f}',
+         f'${afford["b2_cash_after"]:,.0f}',
+         ok(afford['b2_affordable'])],
+    ]
+    afford_ts = TableStyle([
+        ('BACKGROUND',    (0,0),  (-1,0), colors.HexColor('#2E5D9A')),
+        ('TEXTCOLOR',     (0,0),  (-1,0), colors.white),
+        ('FONTNAME',      (0,0),  (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE',      (0,0),  (-1,-1), 8),
+        ('ROWBACKGROUNDS',(0,1),  (-1,-1), [colors.white, colors.HexColor('#EEF4FF')]),
+        ('GRID',          (0,0),  (-1,-1), 0.3, colors.HexColor('#CCCCCC')),
+        ('VALIGN',        (0,0),  (-1,-1), 'MIDDLE'),
+        ('TOPPADDING',    (0,0),  (-1,-1), 4),
+        ('BOTTOMPADDING', (0,0),  (-1,-1), 4),
+        ('TEXTCOLOR',     (5,1),  (5,-1),  colors.HexColor('#1E6B3A')),
+        ('FONTNAME',      (5,1),  (5,-1),  'Helvetica-Bold'),
+    ])
+    story.append(Table(afford_data,
+                       colWidths=[1.7*inch, 1.1*inch, 1.1*inch, 1.1*inch, 1.0*inch, 1.5*inch],
+                       style=afford_ts))
+
+    # Monte Carlo delay stats
+    story.append(Spacer(1, 6))
+    delay_data = [
+        ['', 'Scheduled Month', 'Median Actual Month', '% of Paths Delayed'],
+        ['Option A home purchase',
+         f'Month {A_MOVEOUT}',
+         f'Month {int(base["a_purchase_med"]) if not np.isnan(base["a_purchase_med"]) else "Never"}',
+         f'{base["a_purchase_delayed_pct"]:.0f}%'],
+        ['Option B House 2 purchase',
+         f'Month {B_MOVEOUT}',
+         f'Month {int(base["b2_purchase_med"]) if not np.isnan(base["b2_purchase_med"]) else "Never"}',
+         f'{base["b2_purchase_delayed_pct"]:.0f}%'],
+    ]
+    story.append(Paragraph('Purchase Delay Statistics (across all 1,000 Monte Carlo paths):', S['h2']))
+    story.append(table(delay_data, [2.2*inch, 1.3*inch, 1.6*inch, 1.6*inch]))
+    story.append(Spacer(1, 4))
     story.append(PageBreak())
 
     # Key results
@@ -1102,6 +1327,8 @@ def build_pdf(base, tv, scenarios, charts):
 # =============================================================================
 
 if __name__ == '__main__':
+    afford = affordability_check()
+
     print(f'\n[1/6] Running base simulation (no time value)...')
     base = monte_carlo(use_time_value=False, income_growth_annual=0.0, label='Base')
 
@@ -1130,7 +1357,7 @@ if __name__ == '__main__':
     ]
 
     print('[5/6] Building PDF report...')
-    pdf_path = build_pdf(base, tv, scenarios, charts)
+    pdf_path = build_pdf(base, tv, scenarios, charts, afford)
 
     print('[6/6] Done.\n')
     print('=' * 65)
