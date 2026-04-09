@@ -374,7 +374,7 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
 
         # Phase transition: move out of trailer, buy permanent home
         # Only buy when scheduled AND cash is actually sufficient
-        if a_in_trailer and month > A_MOVEOUT and a_cash >= A_UPFRONT:
+        if a_in_trailer and month >= A_MOVEOUT and a_cash >= A_UPFRONT:
             a_in_trailer = False
             a_cash      -= A_UPFRONT
             a_loan_bal   = A_LOAN
@@ -411,7 +411,7 @@ def run_one_path(use_time_value=False, income_growth_annual=0.0):
 
         # Phase transition: move out of House 1, buy House 2
         # Only buy when scheduled AND cash is actually sufficient
-        if b_in_house1 and month > B_MOVEOUT and b_cash >= B2_UPFRONT:
+        if b_in_house1 and month >= B_MOVEOUT and b_cash >= B2_UPFRONT:
             b_in_house1  = False
             b_has_house2 = True
             b_cash      -= B2_UPFRONT
@@ -818,7 +818,7 @@ def chart_gas():
 
     fig, ax = plt.subplots(figsize=(11, 5))
     ax.plot(X, a_cum, color=COL_A, lw=2.5, label=f'Option A — trailer ${TRAILER_GAS:.0f}/mo → home ${A_GAS:.0f}/mo')
-    ax.plot(X, b_cum, color=COL_B, lw=2.5, label=f'Option B — house ${B1_GAS:.0f}/mo → house2 ${B2_GAS:.0f}/mo')
+    ax.plot(X, b_cum, color=COL_B, lw=2.5, label=f'Option B — House 1 ${B1_GAS:.0f}/mo → House 2 ${B2_GAS:.0f}/mo')
     ax.fill_between(X, b_cum, a_cum, where=[a >= b for a, b in zip(a_cum, b_cum)],
                     alpha=0.15, color=COL_WARN,
                     label=f'Total A saves: ${a_cum[-1]-b_cum[-1]:,.0f} less spent by B')
