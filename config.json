@@ -1,111 +1,83 @@
 {
-  "__________ HOW TO USE THIS FILE __________": [
-    "Change any number after the colon on each line.",
-    "Do NOT change the names on the left side.",
-    "Lines starting with __ are just descriptions - ignore them.",
-    "Save the file, then go to Actions tab and click Run Workflow."
-  ],
+  "simulation": {
+    "months": 180,
+    "mc_runs": 1000
+  },
 
-  "__ SIMULATION LENGTH __": "How far into the future to model",
-  "months": 180,
-  "__ months tip": "180 = 15 years | 120 = 10 years | 60 = 5 years",
+  "finances": {
+    "monthly_income": 5100,
+    "starting_cash": 22000
+  },
 
-  "__ MONTE CARLO RUNS __": "How many random simulations to run",
-  "mc_runs": 1000,
-  "__ mc_runs tip": "100 = fast (rough) | 500 = good | 1000 = best | 5000 = very precise (slow)",
+  "option_a": {
+    "trailer": {
+      "fixup_cost": 4000,
+      "monthly_fixed": 1700,
+      "gas": 600,
+      "repair_mean": 50,
+      "repair_std": 40
+    },
+    "moveout_month": 24,
+    "permanent_home": {
+      "price": 200000,
+      "down_pct": 5.0,
+      "closing_pct": 4.0,
+      "apr": 7.0,
+      "term_months": 360,
+      "monthly_fixed": 1800,
+      "gas": 350,
+      "repair_mean": 150,
+      "repair_std": 100,
+      "repair_cap": 1500
+    }
+  },
 
-  "__________ YOUR FINANCES __________": "",
+  "option_b": {
+    "house1": {
+      "price": 98500,
+      "down_pct": 3.5,
+      "closing_pct": 5.0,
+      "apr": 7.0,
+      "term_months": 360,
+      "monthly_fixed": 1800,
+      "gas": 300,
+      "repair_mean": 200,
+      "repair_std": 150,
+      "repair_cap": 1200
+    },
+    "moveout_month": 36,
+    "rental": {
+      "rent_min": 800,
+      "rent_max": 1000,
+      "vacancy_rate_pct": 8
+    },
+    "house2": {
+      "price": 200000,
+      "down_pct": 10.0,
+      "closing_pct": 4.0,
+      "apr": 7.0,
+      "term_months": 360,
+      "monthly_fixed": 1900,
+      "gas": 350,
+      "repair_mean": 175,
+      "repair_std": 125,
+      "repair_cap": 1500
+    }
+  },
 
-  "monthly_income": 5100,
-  "__ monthly_income tip": "Combined take-home pay for both people after taxes",
-  "starting_cash": 22000,
-  "__ starting_cash tip": "Total savings available at wedding date (Nov 2026)",
+  "goals": {
+    "passive_income_goal": 500
+  },
 
-  "__________ OPTION A - TRAILER THEN BUY __________": "",
+  "commute": {
+    "hourly_time_value": 16,
+    "extra_hours_per_month": 35
+  },
 
-  "trailer_fixup_cost": 4000,
-  "__ trailer_fixup_cost tip": "One-time cost to make trailer livable",
-  "trailer_monthly_fixed": 1700,
-  "__ trailer_monthly_fixed tip": "Monthly living expenses in trailer (not counting gas or repairs)",
-  "trailer_gas": 600,
-  "__ trailer_gas tip": "Monthly gas in trailer phase (long commute, 2 cars)",
-  "trailer_repair_mean": 50,
-  "__ trailer_repair_mean tip": "Average monthly trailer maintenance cost",
-  "trailer_repair_std": 40,
-
-  "a_moveout_month": 24,
-  "__ a_moveout_month tip": "Month they leave trailer and buy permanent home (24 = 2 years)",
-
-  "a_house_price": 200000,
-  "__ a_house_price tip": "Purchase price of Option A permanent home",
-  "a_house_down_pct": 5.0,
-  "__ a_house_down_pct tip": "Down payment percent (3.5 = FHA minimum)",
-  "a_house_closing_pct": 4.0,
-  "a_house_apr": 7.0,
-  "__ a_house_apr tip": "Mortgage interest rate percent",
-  "a_house_term_months": 360,
-  "__ a_house_term_months tip": "360 = 30 year loan | 180 = 15 year loan",
-  "a_house_monthly_fixed": 1800,
-  "a_house_gas": 350,
-  "a_house_repair_mean": 150,
-  "a_house_repair_std": 100,
-  "a_house_repair_cap": 1500,
-  "__ a_house_repair_cap tip": "Most repairs can cost in a single month",
-
-  "__________ OPTION B - BUY NOW THEN RENT IT __________": "",
-
-  "b_house1_price": 98500,
-  "__ b_house1_price tip": "The house they buy now",
-  "b_house1_down_pct": 3.5,
-  "b_house1_closing_pct": 5.0,
-  "b_house1_apr": 7.0,
-  "b_house1_term_months": 360,
-  "b_house1_monthly_fixed": 1800,
-  "b_house1_gas": 300,
-  "__ b_house1_gas tip": "Shorter commute while living in House 1",
-  "b_house1_repair_mean": 200,
-  "b_house1_repair_std": 150,
-  "b_house1_repair_cap": 1200,
-
-  "b_moveout_month": 36,
-  "__ b_moveout_month tip": "Month they move out and House 1 becomes a rental (36 = 3 years)",
-
-  "b_rent_min": 800,
-  "__ b_rent_min tip": "Minimum monthly rent from House 1",
-  "b_rent_max": 1000,
-  "__ b_rent_max tip": "Maximum monthly rent from House 1",
-  "b_vacancy_rate_pct": 8,
-  "__ b_vacancy_rate_pct tip": "Percent of months the rental sits empty",
-
-  "b_house2_price": 200000,
-  "__ b_house2_price tip": "Their permanent second home",
-  "b_house2_down_pct": 10.0,
-  "__ b_house2_down_pct tip": "Higher down payment possible thanks to rental income savings",
-  "b_house2_closing_pct": 4.0,
-  "b_house2_apr": 7.0,
-  "b_house2_term_months": 360,
-  "b_house2_monthly_fixed": 1900,
-  "b_house2_gas": 350,
-  "b_house2_repair_mean": 175,
-  "b_house2_repair_std": 125,
-  "b_house2_repair_cap": 1500,
-
-  "__________ GOALS AND RATES __________": "",
-
-  "passive_income_goal": 500,
-  "__ passive_income_goal tip": "Monthly passive income target - sim tracks when Option B hits this",
-
-  "hourly_time_value": 16,
-  "__ hourly_time_value tip": "What an hour of your time is worth in dollars",
-  "extra_commute_hrs_per_month": 35,
-  "__ extra_commute_hrs_per_month tip": "Extra hours per month commuting in Option A vs Option B",
-
-  "annual_appreciation_pct": 3.0,
-  "__ annual_appreciation_pct tip": "How much homes gain in value per year",
-  "annual_inflation_pct": 3.0,
-  "__ annual_inflation_pct tip": "How much everyday costs rise per year",
-  "annual_invest_return_pct": 4.5,
-  "__ annual_invest_return_pct tip": "Interest earned on savings / HYSA",
-  "gas_volatility_pct": 15,
-  "__ gas_volatility_pct tip": "How much gas prices randomly swing each month"
+  "rates": {
+    "annual_appreciation_pct": 3.0,
+    "annual_inflation_pct": 3.0,
+    "annual_invest_return_pct": 4.5,
+    "gas_volatility_pct": 15
+  }
 }
