@@ -1,12 +1,12 @@
 {
   "simulation": {
-    "months": 72,
+    "months": 120,
     "mc_runs": 1000
   },
 
   "finances": {
     "monthly_income": 5100,
-    "starting_cash": 22000
+    "starting_cash": 20000
   },
 
   "option_a": {
@@ -20,8 +20,8 @@
     "moveout_month": 25,
     "permanent_home": {
       "price": 200000,
-      "down_pct": 4.0,
-      "closing_pct": 4.0,
+      "down_pct": 10.0,
+      "closing_pct": 5.0,
       "apr": 7.0,
       "term_months": 360,
       "monthly_fixed": 1800,
@@ -34,12 +34,12 @@
 
   "option_b": {
     "house1": {
-      "price": 98501,
+      "price": 98502,
       "down_pct": 3.5,
       "closing_pct": 5.0,
       "apr": 7.0,
       "term_months": 360,
-      "monthly_fixed": 1800,
+      "monthly_fixed": 1900,
       "gas": 300,
       "repair_mean": 200,
       "repair_std": 150,
@@ -54,10 +54,10 @@
     "house2": {
       "price": 200000,
       "down_pct": 10.0,
-      "closing_pct": 4.0,
+      "closing_pct": 5.0,
       "apr": 7.0,
       "term_months": 360,
-      "monthly_fixed": 1900,
+      "monthly_fixed": 2200,
       "gas": 350,
       "repair_mean": 175,
       "repair_std": 125,
@@ -66,7 +66,7 @@
   },
 
   "goals": {
-    "passive_income_goal": 350
+    "passive_income_goal": 300
   },
 
   "commute": {
