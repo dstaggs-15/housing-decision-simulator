@@ -1,5 +1,5 @@
 # Housing Decision Simulator
-**A financial simulator comparing two housing paths for a newly married couple in Muscle Shoals, AL starting November 2026.**
+**A financial simulator comparing two housing paths**
 
 ---
 
@@ -15,7 +15,7 @@ This program runs 1,000 versions of the next 15 years of your financial life —
 Live in a trailer on the parents' property for about 2 years to save money, then buy a permanent home. Lower upfront cost, but a long commute every day means higher gas bills for two cars. Builds zero equity during the trailer phase. Pays closing costs twice — once when buying the permanent home.
 
 **Option B — Buy Now, Then Rent It**
-Buy the $98,500 house immediately. Live in it for about 3 years while building equity and saving on gas (shorter commute). Then move out, let a tenant rent it, and use that rental income to help buy a second permanent home. End up owning two properties. Also pays closing costs twice — but the second purchase is partially funded by rental income already collected.
+Buy a house immediately. Live in it for about a few years while building equity and saving on gas (shorter commute). Then move out, let a tenant rent it, and use that rental income to help buy a second permanent home. End up owning two properties. Also pays closing costs twice — but the second purchase is partially funded by rental income already collected.
 
 ---
 
@@ -23,7 +23,7 @@ Buy the $98,500 house immediately. Live in it for about 3 years while building e
 
 Real life is unpredictable. Gas prices go up and down. Some months a repair bill is $80, some months it's $900. Sometimes a rental sits empty. A simple calculator ignores all of that and gives you one answer based on everything going perfectly as planned.
 
-This simulator instead runs the full 15 years 1,000 separate times. Each run uses slightly different random numbers — a different gas price this month, a different repair bill that month — just like real life. The result is 1,000 different outcomes. You can then see: in the typical future, which option wins? What about the bad futures? What about the good ones? How often does Option B win — is it 60% of the time or 95%?
+This simulator instead runs years of simulations 1,000 separate times(or whatever number is chosen). Each run uses slightly different random numbers — a different gas price this month, a different repair bill that month — just like real life. The result is 1,000 different outcomes. You can then see: in the typical future, which option wins? What about the bad futures? What about the good ones? How often does Option B win — is it 60% of the time or 95%?
 
 ---
 
