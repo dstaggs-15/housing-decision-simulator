@@ -19,7 +19,7 @@
     },
     "moveout_month": 25,
     "permanent_home": {
-      "price": 200000,
+      "price": 250000,
       "down_pct": 10.0,
       "closing_pct": 5.0,
       "apr": 7.0,
@@ -52,7 +52,7 @@
       "vacancy_rate_pct": 10
     },
     "house2": {
-      "price": 200000,
+      "price": 250000,
       "down_pct": 10.0,
       "closing_pct": 5.0,
       "apr": 7.0,
